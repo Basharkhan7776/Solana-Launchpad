@@ -54,9 +54,9 @@ export function SendTokens() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="to">Enter recpient wallet address</Label>
-                            <Input id="to" placeholder="Enter the address" onChange={()=>setTo} />
+                            <Input id="to" value={to} placeholder="Enter the address" onChange={(e)=>setTo(e.target.value)} />
                             <Label htmlFor="amount">Enter the amount that you want to send</Label>
-                            <NumberInput id="amount" placeholder="Enter the amount" min={0} max={100} stepper={1} onChange={()=>setAmount} />
+                            <NumberInput id="amount" value={amount} placeholder="Enter the amount" min={0} max={100} stepper={1} onChange={(e)=>setAmount(Number(e.target.value))} />
                         </div>
                     </div>
                 </form>

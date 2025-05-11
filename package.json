@@ -27,6 +27,7 @@
     "@solana/web3.js": "^1.98.2",
     "@tailwindcss/vite": "^4.1.6",
     "autoprefixer": "^10.4.21",
+    "bs58": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.509.0",

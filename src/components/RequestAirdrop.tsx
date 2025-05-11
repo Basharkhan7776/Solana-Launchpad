@@ -47,7 +47,7 @@ export function RequestAirdrop() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="amount">Enter the amount in SOL</Label>
-                            <NumberInput onChange={()=>setAmount} id="amount" placeholder="Enter the amount" min={0} max={100} stepper={1} />
+                            <NumberInput value={amount} onChange={(e)=>setAmount(Number(e.target.value))} id="amount" placeholder="Enter the amount" min={0} max={100} stepper={1} />
                         </div>
                     </div>
                 </form>
