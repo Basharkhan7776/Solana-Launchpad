@@ -26,7 +26,7 @@ export function Showbalance() {
     }, [wallet.publicKey, connection]);
 
     return (
-        <Card className="w-[350px]">
+        <Card className="w-auto">
             <CardHeader>
                 <CardTitle>Current balance</CardTitle>
                 <CardDescription>

@@ -9,6 +9,7 @@ import { RequestAirdrop } from '@/components/RequestAirdrop';
 import { Showbalance } from '@/components/Showbalance';
 import { SendTokens } from '@/components/SendTokens';
 import SignMessage from './components/SignMessage';
+import { LaunchPad } from './components/LaunchPad';
 
 
 
@@ -26,6 +27,7 @@ function App() {
                 <SendTokens/>
                 <RequestAirdrop/>
                 <SignMessage/>
+                <LaunchPad/>
               </div>
               <Footer />
             </div>

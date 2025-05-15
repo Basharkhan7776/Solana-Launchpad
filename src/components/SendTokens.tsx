@@ -42,7 +42,7 @@ export function SendTokens() {
 
 
     return (
-        <Card className="w-[350px]">
+        <Card className="w-auto">
             <CardHeader>
                 <CardTitle>Send Solana</CardTitle>
                 <CardDescription>

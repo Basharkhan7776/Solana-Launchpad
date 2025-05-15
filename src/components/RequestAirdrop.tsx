@@ -35,7 +35,7 @@ export function RequestAirdrop() {
 
 
     return (
-        <Card className="w-[350px]">
+        <Card className="w-auto">
             <CardHeader>
                 <CardTitle>Request Airdrop</CardTitle>
                 <CardDescription>
