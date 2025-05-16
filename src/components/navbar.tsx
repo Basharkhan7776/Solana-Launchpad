@@ -1,25 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Logo } from "./logo";
-import { NavMenu } from "./nav-menu";
 import { NavigationSheet } from "./navigation-sheet";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { Wallet } from "@/provider/wallet-adapter";
+
 
 const Navbar = () => {
   const { isDarkMode, toggleTheme } = useTheme();
   
   return (
     <div className="bg-muted">
-      <nav className="fixed top-4 inset-x-4 h-16 bg-primary-foreground border max-w-screen-xl mx-auto rounded-full">
+      <nav className="fixed top-4 inset-x-4 h-16 bg-primary-foreground border shadow max-w-screen-xl mx-auto rounded-xl">
         <div className="h-full flex items-center justify-between mx-auto px-4">
           <Logo />
           <div>
             {/* Desktop Menu */}
-            <NavMenu className="hidden md:block" />
+            
           </div>
           <div className="flex items-center gap-3">
-            <Wallet/>
+            
             {/* Theme mode toggel*/}
             <Button
               variant={"secondary"}

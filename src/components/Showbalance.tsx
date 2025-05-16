@@ -26,7 +26,7 @@ export function Showbalance() {
     }, [wallet.publicKey, connection]);
 
     return (
-        <Card className="w-auto">
+        <Card className="w-full h-full flex flex-col justify-between">
             <CardHeader>
                 <CardTitle>Current balance</CardTitle>
                 <CardDescription>
@@ -38,7 +38,7 @@ export function Showbalance() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex justify-between items-center">
                             <Label htmlFor="amount">SOL :</Label>
-                            <h1>{balance}</h1>
+                            <h1 className="text-2xl">{balance}</h1>
                         </div>
                     </div>
                 </form>

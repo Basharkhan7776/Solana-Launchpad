@@ -11,7 +11,7 @@ import { ArrowDown } from "lucide-react";
 export function RequestAirdrop() {
     const wallet = useWallet();
     const { connection } = useConnection();
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number>(NaN);
 
     const handleAirdrop = async () => {
         if (wallet.connected) {
@@ -35,7 +35,7 @@ export function RequestAirdrop() {
 
 
     return (
-        <Card className="w-auto">
+        <Card className="w-full h-full flex flex-col justify-between">
             <CardHeader>
                 <CardTitle>Request Airdrop</CardTitle>
                 <CardDescription>

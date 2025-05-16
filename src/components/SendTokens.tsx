@@ -11,7 +11,7 @@ import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 export function SendTokens() {
     const wallet = useWallet();
     const { connection } = useConnection();
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number>(NaN);
     const [to, setTo] = useState<string>("");
 
 
@@ -42,7 +42,7 @@ export function SendTokens() {
 
 
     return (
-        <Card className="w-auto">
+        <Card className="w-full h-full flex flex-col justify-between">
             <CardHeader>
                 <CardTitle>Send Solana</CardTitle>
                 <CardDescription>
