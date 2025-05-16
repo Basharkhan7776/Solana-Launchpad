@@ -24,14 +24,19 @@ export function LaunchPad() {
             return;
         }
 
+        if (!image) {
+            console.error("Image URL is missing");
+            return;
+        }
+
         try {
             const mintKeypair = Keypair.generate();
             const metadata = {
                 mint: mintKeypair.publicKey,
                 name: tokenName,
                 symbol: symbol,
-                uri: image,
-                additionalMetadata: [], 
+                uri: image, // Cloudinary URL
+                additionalMetadata: [],
             };
 
             const mintLen = getMintLen([ExtensionType.MetadataPointer]);
@@ -66,7 +71,7 @@ export function LaunchPad() {
                     metadata: mintKeypair.publicKey,
                     name: metadata.name,
                     symbol: metadata.symbol,
-                    uri: metadata.uri,
+                    uri: metadata.uri, // Ensure this is passed correctly
                     mintAuthority: wallet.publicKey,
                     updateAuthority: wallet.publicKey,
                 })
@@ -105,7 +110,7 @@ export function LaunchPad() {
                     mintKeypair.publicKey,
                     associatedToken,
                     wallet.publicKey,
-                    supply * 10 ** 9, // Assuming supply is in whole tokens
+                    supply * 10 ** 9, 
                     [],
                     TOKEN_2022_PROGRAM_ID
                 )
@@ -114,10 +119,22 @@ export function LaunchPad() {
             await wallet.sendTransaction(transaction3, connection);
 
             console.log("Minted successfully!");
+
+            // Debug metadata
+            const metadataAccount = mintKeypair.publicKey; // Use the PublicKey directly
+            const metadataInfo = await connection.getAccountInfo(metadataAccount);
+            if (metadataInfo) {
+                console.log("Metadata Info:", metadataInfo.data.toString());
+            } else {
+                console.error("Metadata account not found");
+            }
         } catch (error) {
             console.error("Error creating token:", error);
         }
     };
+
+
+    console.log(image);
 
     return (
         <Card className="w-auto">
@@ -157,7 +174,7 @@ export function LaunchPad() {
                             </div>
                             <div className="flex w-[160px] flex-col justify-center items-center space-y-1.5">
                                 <Label htmlFor="image">Upload the image</Label>
-                                <InputImage/>
+                                <InputImage image={image} setImage={setImage}/>
                             </div>
                         </div>
                     </div>

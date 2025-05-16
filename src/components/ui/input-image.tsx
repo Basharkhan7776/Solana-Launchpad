@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ImageIcon, XCircleIcon } from "lucide-react";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
+import { Spinner } from "./spinner";
 
 const ImagePreview = ({
   url,
@@ -27,24 +28,53 @@ const ImagePreview = ({
   </div>
 );
 
-export default function InputImage() {
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+export default function InputImage({ image, setImage }: { image: string | null; setImage: any }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUploadToCloudinary = async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET); // Replace with your unsigned preset name
+  
+      // Upload directly to Cloudinary
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, // Replace with your Cloudinary cloud name
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+  
+      const data = await response.json();
+      if (data.secure_url) {
+        setImage(data.secure_url); // Pass the URL to the parent component
+        console.log("Image URL:", data.secure_url); // Log the uploaded image URL here
+      } else {
+        console.error("Upload failed:", data);
+      }
+    } catch (error) {
+      console.error("Image upload failed:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-40">
       <div className="mt-1 w-full">
-        {profilePicture ? (
+        {image ? (
           <ImagePreview
-            url={profilePicture}
-            onRemove={() => setProfilePicture(null)}
+            url={image}
+            onRemove={() => setImage(null)}
           />
         ) : (
           <Dropzone
             onDrop={(acceptedFiles) => {
               const file = acceptedFiles[0];
               if (file) {
-                const imageUrl = URL.createObjectURL(file);
-                setProfilePicture(imageUrl);
+                handleUploadToCloudinary(file);
               }
             }}
             accept={{
@@ -71,7 +101,11 @@ export default function InputImage() {
                 )}
               >
                 <input {...getInputProps()} id="profile" />
-                <ImageIcon className="h-16 w-16" strokeWidth={1.25} />
+                {uploading ? (
+                  <Spinner />
+                ) : (
+                  <ImageIcon className="h-16 w-16" strokeWidth={1.25} />
+                )}
               </div>
             )}
           </Dropzone>
