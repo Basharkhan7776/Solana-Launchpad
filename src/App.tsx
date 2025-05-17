@@ -23,7 +23,7 @@ function App() {
           <ThemeProvider>
             <div className='h-full w-full flex flex-col font-roboto'>
               <Navbar />
-              <div className='lg:mt-4 mt-24 px-4 min-h-screen flex flex-wrap items-center justify-center'>
+              <div className='mt-[90px] lg:mt-[75px] px-4 min-h-screen flex flex-wrap items-center justify-center'>
                 <div className=' md:w-[1280px] w-full flex flex-col gap-4 justify-center'>
                   <div>
                     <ConnectionNavbar />
