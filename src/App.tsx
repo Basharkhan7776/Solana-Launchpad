@@ -11,20 +11,24 @@ import { SendTokens } from '@/components/SendTokens';
 import SignMessage from './components/SignMessage';
 import { LaunchPad } from './components/LaunchPad';
 import { ConnectionNavbar } from './components/ConnectionNavbar';
+import { useRpc } from './context/RpcContext';
+import { Toaster } from "@/components/ui/sonner"
 
 
 
 function App() {
+  const { rpcUrl } = useRpc();
+
 
   return (
-    <ConnectionProvider endpoint={"https://api.devnet.solana.com"}>
+    <ConnectionProvider endpoint={rpcUrl}>
       <WalletProvider wallets={[]} autoConnect>
         <WalletModalProvider>
           <ThemeProvider>
             <div className='h-full w-full flex flex-col font-roboto'>
               <Navbar />
-              <div className='mt-[90px] lg:mt-[75px] px-4 min-h-screen flex flex-wrap items-center justify-center'>
-                <div className=' md:w-[1280px] w-full flex flex-col gap-4 justify-center'>
+              <div className='px-4 min-h-screen flex flex-wrap justify-center'>
+                <div className='mt-[90px] md:w-[1280px] w-full flex flex-col gap-4'>
                   <div>
                     <ConnectionNavbar />
                   </div>
@@ -38,6 +42,7 @@ function App() {
                 </div>
               </div>
               <Footer />
+              <Toaster />
             </div>
           </ThemeProvider>
         </WalletModalProvider>

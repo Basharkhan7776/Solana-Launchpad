@@ -1,4 +1,3 @@
-
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
@@ -61,10 +60,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (
-          document.activeElement ===
-          (ref as React.RefObject<HTMLInputElement>).current
-        ) {
+        const inputElement = (ref as React.RefObject<HTMLInputElement>).current;
+
+        if (document.activeElement === inputElement) {
           if (e.key === 'ArrowUp') {
             handleIncrement();
           } else if (e.key === 'ArrowDown') {

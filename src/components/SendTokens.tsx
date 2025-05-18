@@ -3,38 +3,46 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { ArrowUp } from "lucide-react";
 import { Input } from "./ui/input";
-import { NumberInput } from "./ui/number-input";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { toast } from "sonner"
+import { Spinner } from "./ui/spinner";
 
 export function SendTokens() {
     const wallet = useWallet();
     const { connection } = useConnection();
     const [amount, setAmount] = useState<number>(NaN);
     const [to, setTo] = useState<string>("");
+    const [loading, setLoading] = useState(false);
 
 
     const handleSend = async () => {
         if (wallet.connected) {
             try {
+                setLoading(true);
                 if (!wallet.publicKey) {
                     throw new Error("Wallet public key is null");
+                    toast.error("Wallet is not Connected or pub key is null");
+                    setLoading(false)
                 }
                 const transaction = new Transaction();
                 transaction.add(SystemProgram.transfer({
                     fromPubkey: wallet.publicKey,
                     toPubkey: new PublicKey(to),
-                    lamports: amount * 1e9, 
+                    lamports: amount * 1e9,
                 }));
                 await wallet.sendTransaction(transaction, connection);
-                alert(`Airdrop of ${amount} SOL successful! to ${to}`);
+                toast.success(`Transfer of ${amount} SOL successful! to ${to}`);
+                setLoading(false)
             } catch (error) {
-                console.error("Airdrop failed:", error);
-                alert("Airdrop failed. Please try again.");
+                console.error("Failed:", error);
+                toast.error("Failed please try again.");
+                setLoading(false)
             }
         } else {
-            alert("Please connect your wallet first.");
+            toast.warning("Please connect your wallet first.")
+            setLoading(false)
         }
     };
 
@@ -54,15 +62,15 @@ export function SendTokens() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label htmlFor="to">Enter recpient wallet address</Label>
-                            <Input id="to" value={to} placeholder="Enter the address" onChange={(e)=>setTo(e.target.value)} />
+                            <Input id="to" value={to} placeholder="Enter the address" onChange={(e) => setTo(e.target.value)} />
                             <Label htmlFor="amount">Enter the amount that you want to send</Label>
-                            <NumberInput id="amount" value={amount} placeholder="Enter the amount" min={0} max={100} stepper={1} onChange={(e)=>setAmount(Number(e.target.value))} />
+                            <Input type="number" id="amount" value={amount} placeholder="Enter the amount" min={0} max={100} onChange={(e) => setAmount(Number(e.target.value))} />
                         </div>
                     </div>
                 </form>
             </CardContent>
             <CardFooter >
-                <Button className="w-full" onClick={handleSend} ><ArrowUp /> Send Token</Button>
+                <Button className="w-full" onClick={handleSend} >{(!loading) ? <><ArrowUp /> Send Token</> : <Spinner />}</Button>
             </CardFooter>
         </Card>
     )

@@ -9,7 +9,7 @@ const Navbar = () => {
   const { isDarkMode, toggleTheme } = useTheme();
   
   return (
-    <div className="bg-muted">
+    <div className="bg-muted z-10">
       <nav className="fixed top-4 inset-x-4 h-16 bg-primary-foreground border shadow max-w-screen-xl mx-auto rounded-xl">
         <div className="h-full flex items-center justify-between mx-auto px-4">
           <Logo />

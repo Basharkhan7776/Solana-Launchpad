@@ -10,6 +10,8 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { TOKEN_2022_PROGRAM_ID, createMintToInstruction, createAssociatedTokenAccountInstruction, getMintLen, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, TYPE_SIZE, LENGTH_SIZE, ExtensionType, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { createInitializeInstruction, pack } from '@solana/spl-token-metadata';
 import { NumberInput } from "./ui/number-input";
+import { toast } from "sonner";
+import { Spinner } from "./ui/spinner";
 
 export function LaunchPad() {
     const [tokenName, setTokenName] = useState<string>("");
@@ -17,20 +19,28 @@ export function LaunchPad() {
     const [supply, setSupply] = useState<number>(NaN);
     const [image, setImage] = useState<string>("");
     const { connection } = useConnection();
+    const [loading, setLoading] = useState(false);
     const wallet = useWallet();
 
     const handleSend = async () => {
         if (!wallet.publicKey) {
+            setLoading(true);
+            toast.error("Wallet not connected")
             console.error("Wallet not connected");
+            setLoading(false);
             return;
         }
 
         if (!image) {
+            setLoading(true);
+            toast.warning("Image is missing")
             console.error("Image URL is missing");
+            setLoading(false);
             return;
         }
 
         try {
+            setLoading(true);
             const mintKeypair = Keypair.generate();
             const metadata = {
                 mint: mintKeypair.publicKey,
@@ -93,6 +103,7 @@ export function LaunchPad() {
             );
 
             console.log(`Associated Token Address: ${associatedToken.toBase58()}`);
+            toast("Token Address: " + associatedToken.toBase58());
 
             const transaction2 = new Transaction().add(
                 createAssociatedTokenAccountInstruction(
@@ -120,6 +131,8 @@ export function LaunchPad() {
             await wallet.sendTransaction(transaction3, connection);
 
             console.log("Minted successfully!");
+            toast.success("Minted successfully");
+            setLoading(false)
 
             // Debug metadata
             const metadataAccount = mintKeypair.publicKey; // Use the PublicKey directly
@@ -130,12 +143,14 @@ export function LaunchPad() {
                 console.error("Metadata account not found");
             }
         } catch (error) {
+            setLoading(true);
+            toast.error("Error creating token: " + error)
             console.error("Error creating token:", error);
+            setLoading(false)
         }
     };
 
 
-    console.log(image);
 
     return (
         <Card className="w-full h-full">
@@ -148,8 +163,8 @@ export function LaunchPad() {
             <CardContent>
                 <form>
                     <div className="grid w-full items-center gap-4">
-                        <div className="flex flex-col md:flex-row md:space-x-8 md:space-y-4">
-                            <div className="flex w-[50%] flex-col space-y-1.5">
+                        <div className="flex flex-col md:flex-row space-y-4 md:space-x-8 md:space-y-4">
+                            <div className="flex w-auto md:w-[50%] flex-col space-y-1.5">
                                 <Label htmlFor="tokenName">Enter the name of token</Label>
                                 <Input
                                     id="tokenName"
@@ -165,14 +180,15 @@ export function LaunchPad() {
                                     placeholder="Enter the token symbol"
                                 />
                                 <Label htmlFor="supply">Enter the initial supply</Label>
-                                <NumberInput
+                                <Input
+                                    type="number"
                                     id="supply"
                                     value={supply}
                                     onChange={(e) => setSupply(Number(e.target.value))}
                                     placeholder="Enter the token supply"
                                 />
                             </div>
-                            <div className="flex w-auto md:w-[50%] flex-col justify-center items-center space-y-1.5">
+                            <div className=" flex w-auto md:w-[50%] flex-col justify-center items-center space-y-1.5">
                                 <Label htmlFor="image">Upload the image</Label>
                                 <InputImage image={image} setImage={setImage} />
                             </div>
@@ -182,7 +198,10 @@ export function LaunchPad() {
             </CardContent>
             <CardFooter>
                 <Button className="w-full" onClick={handleSend}>
-                    <CirclePlus /> Create Token
+                    {(!loading) ?
+                        <><CirclePlus /> <p>Create Token</p></>
+                        : <Spinner />
+                    }
                 </Button>
             </CardFooter>
         </Card>

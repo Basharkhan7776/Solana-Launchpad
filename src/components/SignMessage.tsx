@@ -7,19 +7,24 @@ import bs58 from "bs58";
 import { useState } from "react";
 import { MessageSquareCode } from "lucide-react";
 import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
+import { Spinner } from "./ui/spinner";
 
 export default function SignMessage() {
     const { publicKey, signMessage } = useWallet();
     const [message, setMessage] = useState<string>("");
+    const [Loading, setLoading] = useState<boolean>(false);
 
     const handleSign = async () => {
         try {
             if (!publicKey) {
-                throw new Error("Wallet not connected");
+                toast.warning("Wallet not connected")
+                return;
             }
 
             if (!signMessage) {
-                throw new Error("Wallet does not support signing messages");
+                toast.warning("Sign message not supported")
+                return;
             }
 
             // Encode the message
@@ -35,10 +40,11 @@ export default function SignMessage() {
             }
 
             // Display success message
-            alert(`Success! Signature: ${bs58.encode(signature)}`);
+            toast.success(`Success! Signature: ${bs58.encode(signature)}`)
         } catch (error) {
             // Handle errors gracefully
-            alert(`Error: ${error instanceof Error ? error.message : String(error)}`);
+            console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+            toast.error(`Error: ${error instanceof Error ? error.message : String(error)}`)
         }
     };
 
@@ -64,7 +70,7 @@ export default function SignMessage() {
                 </form>
             </CardContent>
             <CardFooter >
-                <Button className="w-full" onClick={handleSign}><MessageSquareCode/> Sign Message</Button>
+                <Button className="w-full" onClick={handleSign}><MessageSquareCode /> Sign Message</Button>
             </CardFooter>
         </Card>
     )

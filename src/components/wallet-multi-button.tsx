@@ -91,7 +91,6 @@ export function WalletMultiButton({
     setDropdownOpen(false);
   };
 
-  console.log(wallet);
 
   if (!wallet) {
     return <Button onClick={openModal}>{content}</Button>;
