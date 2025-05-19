@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 import { Menu, Moon, Sun, Wallet, Send, ArrowDown, MessageSquare, PlusCircle } from "lucide-react";
 import { Logo } from "./logo";
 import { useTheme } from "@/context/ThemeContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef } from "react";
 
 const scrollToComponent = (id: string) => {
