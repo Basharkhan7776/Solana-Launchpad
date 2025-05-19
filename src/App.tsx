@@ -13,12 +13,33 @@ import { LaunchPad } from './components/LaunchPad';
 import { ConnectionNavbar } from './components/ConnectionNavbar';
 import { useRpc } from './context/RpcContext';
 import { Toaster } from "@/components/ui/sonner"
+import { motion } from "framer-motion";
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.3
+        }
+    }
+};
 
+const itemVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    }
+};
 
 function App() {
   const { rpcUrl } = useRpc();
-
 
   return (
     <ConnectionProvider endpoint={rpcUrl}>
@@ -28,18 +49,35 @@ function App() {
             <div className='h-full w-full flex flex-col font-roboto'>
               <Navbar />
               <div className='px-4 min-h-screen flex flex-wrap justify-center'>
-                <div className='mt-[90px] md:w-[1280px] w-full flex flex-col gap-4'>
-                  <div>
+                <motion.div 
+                    className='mt-[90px] md:w-[1280px] w-full flex flex-col gap-4'
+                    initial="hidden"
+                    animate="visible"
+                    variants={containerVariants}
+                >
+                  <motion.div variants={itemVariants}>
                     <ConnectionNavbar />
-                  </div>
-                  <div className='md:grid lg:grid-cols-3 md:grid-cols-2 flex flex-col gap-4'>
-                    <div><Showbalance /></div>
-                    <div><SendTokens /></div>
-                    <div><RequestAirdrop /></div>
-                    <div><SignMessage /></div>
-                    <div className='col-span-2'><LaunchPad /></div>
-                  </div>
-                </div>
+                  </motion.div>
+                  <motion.div 
+                    className='md:grid lg:grid-cols-3 md:grid-cols-2 flex flex-col gap-4'
+                    variants={containerVariants}
+                  >
+                    <motion.div variants={itemVariants} id="showbalance"><Showbalance /></motion.div>
+                    <motion.div variants={itemVariants} id="sendtokens"><SendTokens /></motion.div>
+                    <motion.div variants={itemVariants} id="requestairdrop"><RequestAirdrop /></motion.div>
+                    <motion.div variants={itemVariants} id="signmessage"><SignMessage /></motion.div>
+                    <motion.div 
+                        className='col-span-2' 
+                        variants={itemVariants}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, delay: 0.5 }}
+                        id="launchpad"
+                    >
+                        <LaunchPad />
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
               </div>
               <Footer />
               <Toaster />

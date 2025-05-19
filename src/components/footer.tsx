@@ -11,7 +11,7 @@ const Footer = () => {
   return (
     <div className="">
       <footer>
-        <div className="px-[20%]">
+        <div className="md:px-[20%]">
           <div className="py-8 flex flex-col justify-start items-center ">
             {/* Logo */}
             <Logo textSize="3xl"/>

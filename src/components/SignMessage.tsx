@@ -17,13 +17,16 @@ export default function SignMessage() {
 
     const handleSign = async () => {
         try {
+            setLoading(true);
             if (!publicKey) {
                 toast.warning("Wallet not connected")
+                setLoading(false);
                 return;
             }
 
             if (!signMessage) {
                 toast.warning("Sign message not supported")
+                setLoading(false);
                 return;
             }
 
@@ -41,10 +44,12 @@ export default function SignMessage() {
 
             // Display success message
             toast.success(`Success! Signature: ${bs58.encode(signature)}`)
+            setLoading(false);
         } catch (error) {
             // Handle errors gracefully
             console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
             toast.error(`Error: ${error instanceof Error ? error.message : String(error)}`)
+            setLoading(false);
         }
     };
 
@@ -70,7 +75,7 @@ export default function SignMessage() {
                 </form>
             </CardContent>
             <CardFooter >
-                <Button className="w-full" onClick={handleSign}><MessageSquareCode /> Sign Message</Button>
+                <Button className="w-full" onClick={handleSign}> {Loading ? <Spinner /> : <><MessageSquareCode /><p>Sign Message</p></>}</Button>
             </CardFooter>
         </Card>
     )

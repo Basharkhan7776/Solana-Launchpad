@@ -9,7 +9,6 @@ import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { TOKEN_2022_PROGRAM_ID, createMintToInstruction, createAssociatedTokenAccountInstruction, getMintLen, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, TYPE_SIZE, LENGTH_SIZE, ExtensionType, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { createInitializeInstruction, pack } from '@solana/spl-token-metadata';
-import { NumberInput } from "./ui/number-input";
 import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
 
@@ -22,31 +21,45 @@ export function LaunchPad() {
     const [loading, setLoading] = useState(false);
     const wallet = useWallet();
 
-    const handleSend = async () => {
+    const validateInputs = () => {
+        if (!wallet.connected) {
+            toast.error("Please connect your wallet first");
+            return false;
+        }
         if (!wallet.publicKey) {
-            setLoading(true);
-            toast.error("Wallet not connected")
-            console.error("Wallet not connected");
-            setLoading(false);
-            return;
+            toast.error("Wallet public key is not available");
+            return false;
         }
-
+        if (!tokenName.trim()) {
+            toast.error("Please enter a token name");
+            return false;
+        }
+        if (!symbol.trim()) {
+            toast.error("Please enter a token symbol");
+            return false;
+        }
+        if (isNaN(supply) || supply <= 0) {
+            toast.error("Please enter a valid supply amount");
+            return false;
+        }
         if (!image) {
-            setLoading(true);
-            toast.warning("Image is missing")
-            console.error("Image URL is missing");
-            setLoading(false);
-            return;
+            toast.error("Please upload a token image");
+            return false;
         }
+        return true;
+    };
+
+    const handleSend = async () => {
+        if (!validateInputs() || !wallet.publicKey) return;
 
         try {
             setLoading(true);
             const mintKeypair = Keypair.generate();
             const metadata = {
                 mint: mintKeypair.publicKey,
-                name: tokenName,
-                symbol: symbol,
-                uri: image, // Cloudinary URL
+                name: tokenName.trim(),
+                symbol: symbol.trim().toUpperCase(),
+                uri: image,
                 additionalMetadata: [],
             };
 
@@ -92,7 +105,8 @@ export function LaunchPad() {
             transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
             transaction.partialSign(mintKeypair);
 
-            await wallet.sendTransaction(transaction, connection);
+            const createMintSignature = await wallet.sendTransaction(transaction, connection);
+            await connection.confirmTransaction(createMintSignature);
 
             console.log(`Token mint created at ${mintKeypair.publicKey.toBase58()}`);
             const associatedToken = getAssociatedTokenAddressSync(
@@ -103,9 +117,9 @@ export function LaunchPad() {
             );
 
             console.log(`Associated Token Address: ${associatedToken.toBase58()}`);
-            toast("Token Address: " + associatedToken.toBase58());
+            toast.info(`Token Address: ${associatedToken.toBase58()}`);
 
-            const transaction2 = new Transaction().add(
+            const createAtaTx = new Transaction().add(
                 createAssociatedTokenAccountInstruction(
                     wallet.publicKey,
                     associatedToken,
@@ -115,9 +129,10 @@ export function LaunchPad() {
                 )
             );
 
-            await wallet.sendTransaction(transaction2, connection);
+            const createAtaSignature = await wallet.sendTransaction(createAtaTx, connection);
+            await connection.confirmTransaction(createAtaSignature);
 
-            const transaction3 = new Transaction().add(
+            const mintToTx = new Transaction().add(
                 createMintToInstruction(
                     mintKeypair.publicKey,
                     associatedToken,
@@ -128,11 +143,17 @@ export function LaunchPad() {
                 )
             );
 
-            await wallet.sendTransaction(transaction3, connection);
+            const mintToSignature = await wallet.sendTransaction(mintToTx, connection);
+            await connection.confirmTransaction(mintToSignature);
 
             console.log("Minted successfully!");
-            toast.success("Minted successfully");
-            setLoading(false)
+            toast.success("Token created successfully!");
+            
+            // Reset form
+            setTokenName("");
+            setSymbol("");
+            setSupply(NaN);
+            setImage("");
 
             // Debug metadata
             const metadataAccount = mintKeypair.publicKey; // Use the PublicKey directly
@@ -143,14 +164,16 @@ export function LaunchPad() {
                 console.error("Metadata account not found");
             }
         } catch (error) {
-            setLoading(true);
-            toast.error("Error creating token: " + error)
             console.error("Error creating token:", error);
-            setLoading(false)
+            if (error instanceof Error) {
+                toast.error(`Failed to create token: ${error.message}`);
+            } else {
+                toast.error("Failed to create token. Please try again.");
+            }
+        } finally {
+            setLoading(false);
         }
     };
-
-
 
     return (
         <Card className="w-full h-full">
@@ -161,7 +184,7 @@ export function LaunchPad() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form>
+                <form onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col md:flex-row space-y-4 md:space-x-8 md:space-y-4">
                             <div className="flex w-auto md:w-[50%] flex-col space-y-1.5">
@@ -171,6 +194,7 @@ export function LaunchPad() {
                                     value={tokenName}
                                     onChange={(e) => setTokenName(e.target.value)}
                                     placeholder="Enter the token name"
+                                    disabled={loading}
                                 />
                                 <Label htmlFor="symbol">Enter the symbol of token</Label>
                                 <Input
@@ -178,6 +202,7 @@ export function LaunchPad() {
                                     value={symbol}
                                     onChange={(e) => setSymbol(e.target.value)}
                                     placeholder="Enter the token symbol"
+                                    disabled={loading}
                                 />
                                 <Label htmlFor="supply">Enter the initial supply</Label>
                                 <Input
@@ -186,9 +211,12 @@ export function LaunchPad() {
                                     value={supply}
                                     onChange={(e) => setSupply(Number(e.target.value))}
                                     placeholder="Enter the token supply"
+                                    min={0}
+                                    step={0.1}
+                                    disabled={loading}
                                 />
                             </div>
-                            <div className=" flex w-auto md:w-[50%] flex-col justify-center items-center space-y-1.5">
+                            <div className="flex w-auto md:w-[50%] flex-col justify-center items-center space-y-1.5">
                                 <Label htmlFor="image">Upload the image</Label>
                                 <InputImage image={image} setImage={setImage} />
                             </div>
@@ -197,11 +225,12 @@ export function LaunchPad() {
                 </form>
             </CardContent>
             <CardFooter>
-                <Button className="w-full" onClick={handleSend}>
-                    {(!loading) ?
-                        <><CirclePlus /> <p>Create Token</p></>
-                        : <Spinner />
-                    }
+                <Button 
+                    className="w-full" 
+                    onClick={handleSend}
+                    disabled={loading || !wallet.connected}
+                >
+                    {!loading ? <><CirclePlus /> Create Token</> : <Spinner />}
                 </Button>
             </CardFooter>
         </Card>

@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
@@ -44,24 +42,6 @@ export function WalletMultiButton({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const listener = (event: MouseEvent | TouchEvent) => {
-      const node = ref.current;
-
-      if (!node || node.contains(event.target as Node)) return;
-
-      setDropdownOpen(false);
-    };
-
-    document.addEventListener("mousedown", listener);
-    document.addEventListener("touchstart", listener);
-
-    return () => {
-      document.removeEventListener("mousedown", listener);
-      document.removeEventListener("touchstart", listener);
-    };
-  }, []);
-
   const base58 = useMemo(() => publicKey?.toBase58(), [publicKey]);
   const content = useMemo(() => {
     if (connecting) return labels["connecting"];
@@ -74,33 +54,49 @@ export function WalletMultiButton({
 
   const copyAddress = async () => {
     if (base58) {
-      await navigator.clipboard.writeText(base58);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 400);
+      try {
+        await navigator.clipboard.writeText(base58);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy address:', err);
+      }
     }
   };
 
   const openModal = () => {
-    console.log("openModal");
     setVisible(true);
     setDropdownOpen(false);
   };
 
-  const disconnectWallet = () => {
-    disconnect();
-    setDropdownOpen(false);
+  const disconnectWallet = async () => {
+    try {
+      await disconnect();
+      setDropdownOpen(false);
+    } catch (err) {
+      console.error('Failed to disconnect:', err);
+    }
   };
 
-
   if (!wallet) {
-    return <Button onClick={openModal}>{content}</Button>;
+    return (
+      <Button 
+        onClick={openModal}
+        className="bg-primary hover:bg-primary/90"
+      >
+        {content}
+      </Button>
+    );
   }
 
   return (
     <div ref={ref}>
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <Button className="gap-2">
+          <Button 
+            className="gap-2 bg-primary hover:bg-primary/90"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
             {wallet.adapter.icon && (
               <WalletIcon
                 wallet={{
@@ -112,18 +108,27 @@ export function WalletMultiButton({
             {content}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-[200px]">
           {base58 && (
-            <DropdownMenuItem onClick={copyAddress}>
+            <DropdownMenuItem 
+              onClick={copyAddress}
+              className="cursor-pointer hover:bg-accent"
+            >
               <Copy className="mr-2 h-4 w-4" />
               <span>{copied ? labels["copied"] : labels["copy-address"]}</span>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={openModal}>
+          <DropdownMenuItem 
+            onClick={openModal}
+            className="cursor-pointer hover:bg-accent"
+          >
             <ArrowRightLeft className="mr-2 h-4 w-4" />
             <span>{labels["change-wallet"]}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={disconnectWallet}>
+          <DropdownMenuItem 
+            onClick={disconnectWallet}
+            className="cursor-pointer hover:bg-accent"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>{labels["disconnect"]}</span>
           </DropdownMenuItem>

@@ -16,7 +16,7 @@ const RPC_URLS = {
 };
 
 export const RpcProvider = ({ children }: { children: ReactNode }) => {
-    const [rpc, setRpcState] = useState<"devnet" | "mainnet" | "testnet">("mainnet");
+    const [rpc, setRpcState] = useState<"devnet" | "mainnet" | "testnet">("devnet");
 
     const setRpc = (newRpc: "devnet" | "mainnet" | "testnet") => {
         setRpcState(newRpc);

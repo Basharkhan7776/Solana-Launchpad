@@ -14,25 +14,35 @@ export function Showbalance() {
     const [loading, setLoading] = useState<boolean>(false);
 
     const getBalance = async () => {
-        if (wallet.publicKey) {
-            setLoading(true);
-            try {
-                const balance = await connection.getBalance(wallet.publicKey);
-                setBalance(balance / 1e9); // Convert lamports to SOL
-                setLoading(false)
-            } catch (error) {
-                console.error("Error fetching balance:", error);
-                toast.error("Error in fetching balance ");
-                setLoading(false);
-            }
-        } else {
-            console.log("Wallet not connected")
-            toast.error("Wallet not connected");
+        if (!wallet.connected || !wallet.publicKey) {
+            toast.error("Please connect your wallet first");
+            return;
         }
-    }
+
+        try {
+            setLoading(true);
+            const balance = await connection.getBalance(wallet.publicKey);
+            setBalance(balance / 1e9); // Convert lamports to SOL
+            toast.success("Balance updated successfully");
+        } catch (error) {
+            console.error("Error fetching balance:", error);
+            if (error instanceof Error) {
+                toast.error(`Failed to fetch balance: ${error.message}`);
+            } else {
+                toast.error("Failed to fetch balance. Please try again.");
+            }
+            setBalance(NaN);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        getBalance();
+        if (wallet.connected && wallet.publicKey) {
+            getBalance();
+        } else {
+            setBalance(NaN);
+        }
     }, [wallet.publicKey, connection]);
 
     return (
@@ -48,17 +58,26 @@ export function Showbalance() {
                     <div className="grid w-full items-center gap-4">
                         <div className="flex justify-between items-center">
                             <Label htmlFor="amount">SOL :</Label>
-                            <h1 className="text-2xl">{Number.isNaN(balance) ? "..." : balance}</h1>
+                            <h1 className="text-2xl">
+                                {Number.isNaN(balance) 
+                                    ? wallet.connected 
+                                        ? "Loading..." 
+                                        : "Connect wallet"
+                                    : balance.toFixed(4)}
+                            </h1>
                         </div>
                     </div>
                 </form>
             </CardContent>
-            <CardFooter >
-                <Button className="w-full" onClick={getBalance}>
-                    {(!loading) ? <><RefreshCcw /> Refresh</>
-                        : <Spinner />}
+            <CardFooter>
+                <Button 
+                    className="w-full" 
+                    onClick={getBalance}
+                    disabled={loading || !wallet.connected}
+                >
+                    {!loading ? <><RefreshCcw /> Refresh</> : <Spinner />}
                 </Button>
             </CardFooter>
         </Card>
-    )
+    );
 }
