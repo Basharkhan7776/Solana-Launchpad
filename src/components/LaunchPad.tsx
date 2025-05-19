@@ -228,7 +228,7 @@ export function LaunchPad() {
                 <Button 
                     className="w-full" 
                     onClick={handleSend}
-                    disabled={loading || !wallet.connected}
+                    disabled={loading}
                 >
                     {!loading ? <><CirclePlus /> Create Token</> : <Spinner />}
                 </Button>

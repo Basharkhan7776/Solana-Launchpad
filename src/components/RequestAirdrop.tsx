@@ -96,7 +96,7 @@ export function RequestAirdrop() {
                 <Button 
                     className="w-full" 
                     onClick={handleAirdrop}
-                    disabled={loading || !wallet.connected}
+                    disabled={loading}
                 >
                     {!loading ? <><ArrowDown /> Request Airdrop</> : <Spinner />}
                 </Button>

@@ -13,8 +13,7 @@ import { Spinner } from "./ui/spinner";
 export default function SignMessage() {
     const { publicKey, signMessage } = useWallet();
     const [message, setMessage] = useState<string>("");
-    const [Loading, setLoading] = useState<boolean>(false);
-    const wallet = useWallet();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleSign = async () => {
         try {
@@ -76,7 +75,7 @@ export default function SignMessage() {
                 </form>
             </CardContent>
             <CardFooter >
-                <Button className="w-full" onClick={handleSign} disabled={Loading || !wallet.connect}> {Loading ? <Spinner /> : <><MessageSquareCode /><p>Sign Message</p></>}</Button>
+                <Button className="w-full" onClick={handleSign} disabled={loading}> {loading ? <Spinner /> : <><MessageSquareCode /><p>Sign Message</p></>}</Button>
             </CardFooter>
         </Card>
     )

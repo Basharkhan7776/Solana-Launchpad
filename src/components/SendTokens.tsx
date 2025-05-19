@@ -111,7 +111,7 @@ export function SendTokens() {
                 <Button 
                     className="w-full" 
                     onClick={handleSend}
-                    disabled={loading || !wallet.connected}
+                    disabled={loading}
                 >
                     {!loading ? <><ArrowUp /> Send Token</> : <Spinner />}
                 </Button>

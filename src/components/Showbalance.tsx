@@ -61,8 +61,8 @@ export function Showbalance() {
                             <h1 className="text-2xl">
                                 {Number.isNaN(balance) 
                                     ? wallet.connected 
-                                        ? "Loading..." 
-                                        : "Connect wallet"
+                                        ? <Spinner/> 
+                                        : "..."
                                     : balance.toFixed(4)}
                             </h1>
                         </div>
@@ -73,7 +73,7 @@ export function Showbalance() {
                 <Button 
                     className="w-full" 
                     onClick={getBalance}
-                    disabled={loading || !wallet.connected}
+                    disabled={loading}
                 >
                     {!loading ? <><RefreshCcw /> Refresh</> : <Spinner />}
                 </Button>
