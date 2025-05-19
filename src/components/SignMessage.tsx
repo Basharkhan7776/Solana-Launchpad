@@ -5,7 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from "bs58";
 import { useState } from "react";
-import { MessageSquareCode } from "lucide-react";
+import { MessageSquareCode, Wallet } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
@@ -14,6 +14,7 @@ export default function SignMessage() {
     const { publicKey, signMessage } = useWallet();
     const [message, setMessage] = useState<string>("");
     const [Loading, setLoading] = useState<boolean>(false);
+    const wallet = useWallet();
 
     const handleSign = async () => {
         try {
@@ -75,7 +76,7 @@ export default function SignMessage() {
                 </form>
             </CardContent>
             <CardFooter >
-                <Button className="w-full" onClick={handleSign}> {Loading ? <Spinner /> : <><MessageSquareCode /><p>Sign Message</p></>}</Button>
+                <Button className="w-full" onClick={handleSign} disabled={Loading || !wallet.connect}> {Loading ? <Spinner /> : <><MessageSquareCode /><p>Sign Message</p></>}</Button>
             </CardFooter>
         </Card>
     )
