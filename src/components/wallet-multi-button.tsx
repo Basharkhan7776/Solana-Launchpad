@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,7 @@ export function WalletMultiButton({
   const [copied, setCopied] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const [walletSelected, setWalletSelected] = useState(false);
 
   const base58 = useMemo(() => publicKey?.toBase58(), [publicKey]);
   const content = useMemo(() => {
@@ -67,16 +68,26 @@ export function WalletMultiButton({
   const openModal = () => {
     setVisible(true);
     setDropdownOpen(false);
+    setWalletSelected(true);
   };
 
   const disconnectWallet = async () => {
     try {
       await disconnect();
       setDropdownOpen(false);
+      setTimeout(() => window.location.reload(), 200);
     } catch (err) {
       console.error('Failed to disconnect:', err);
     }
   };
+
+  // Reload the page after a wallet is selected
+  useEffect(() => {
+    if (wallet && publicKey && walletSelected) {
+      setWalletSelected(false);
+      setTimeout(() => window.location.reload(), 200);
+    }
+  }, [wallet, publicKey, walletSelected]);
 
   if (!wallet) {
     return (
