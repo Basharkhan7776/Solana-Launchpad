@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 :root {
   --background: #fcfcfc;
   --foreground: #000000;
@@ -148,6 +151,24 @@
   --shadow-2xl: var(--shadow-2xl);
   --font-oswald: 'Oswald', sans-serif;
   --font-roboto: 'Roboto', sans-serif;
+  --animate-grid: grid 15s linear infinite;
+
+  @keyframes grid {
+    0% {
+      transform: translateY(-50%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes grid {
+  0% {
+    transform: translateY(-50%);
+    }
+  100% {
+    transform: translateY(0);
+    }
+  }
 }
 
 @layer base {
@@ -158,4 +179,3 @@
     @apply bg-background text-foreground;
   }
 }
-  
