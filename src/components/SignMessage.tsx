@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,21 +13,27 @@ import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
 
 export default function SignMessage() {
-    const { publicKey, signMessage } = useWallet();
+    const { publicKey, signMessage, connected } = useWallet();
     const [message, setMessage] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleSign = async () => {
         try {
             setLoading(true);
-            if (!publicKey) {
-                toast.warning("Wallet not connected")
+            if (!connected || !publicKey) {
+                toast.error("Please connect your wallet first");
                 setLoading(false);
                 return;
             }
 
             if (!signMessage) {
                 toast.warning("Sign message not supported")
+                setLoading(false);
+                return;
+            }
+
+            if (!message.trim()) {
+                toast.error("Please enter a message to sign");
                 setLoading(false);
                 return;
             }

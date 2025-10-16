@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { useWalletModal } from "@/hooks/use-wallet-model"
 

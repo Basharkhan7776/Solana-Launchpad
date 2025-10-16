@@ -1,3 +1,5 @@
+"use client";
+
 import { WalletModalContext } from "@/provider/wallet-model";
 import { useContext } from "react";
 

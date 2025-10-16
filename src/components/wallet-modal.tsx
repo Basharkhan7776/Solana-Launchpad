@@ -1,3 +1,5 @@
+"use client";
+
 
 import { useState, useMemo } from "react";
 import type { WalletName } from "@solana/wallet-adapter-base"; // Use 'import type' for types

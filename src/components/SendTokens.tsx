@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -12,7 +14,7 @@ import { Spinner } from "./ui/spinner";
 export function SendTokens() {
     const wallet = useWallet();
     const { connection } = useConnection();
-    const [amount, setAmount] = useState<number>(NaN);
+    const [amount, setAmount] = useState<string>("");
     const [to, setTo] = useState<string>("");
     const [loading, setLoading] = useState(false);
 
@@ -29,13 +31,14 @@ export function SendTokens() {
             toast.error("Please enter a recipient address");
             return false;
         }
-        if (isNaN(amount) || amount <= 0) {
+        const numAmount = parseFloat(amount);
+        if (!amount || isNaN(numAmount) || numAmount <= 0) {
             toast.error("Please enter a valid amount");
             return false;
         }
         try {
             new PublicKey(to);
-        } catch (error) {
+        } catch {
             toast.error("Invalid recipient address");
             return false;
         }
@@ -48,17 +51,18 @@ export function SendTokens() {
         try {
             setLoading(true);
             const transaction = new Transaction();
+            const numAmount = parseFloat(amount);
             transaction.add(SystemProgram.transfer({
                 fromPubkey: wallet.publicKey!,
                 toPubkey: new PublicKey(to),
-                lamports: amount * 1e9,
+                lamports: numAmount * 1e9,
             }));
 
             const signature = await wallet.sendTransaction(transaction, connection);
             await connection.confirmTransaction(signature);
             
-            toast.success(`Successfully sent ${amount} SOL to ${to.slice(0, 4)}...${to.slice(-4)}`);
-            setAmount(NaN);
+            toast.success(`Successfully sent ${numAmount} SOL to ${to.slice(0, 4)}...${to.slice(-4)}`);
+            setAmount("");
             setTo("");
         } catch (error) {
             console.error("Transaction failed:", error);
@@ -100,7 +104,7 @@ export function SendTokens() {
                                 placeholder="Enter the amount" 
                                 min={0} 
                                 max={100} 
-                                onChange={(e) => setAmount(Number(e.target.value))}
+                                onChange={(e) => setAmount(e.target.value)}
                                 disabled={loading}
                             />
                         </div>

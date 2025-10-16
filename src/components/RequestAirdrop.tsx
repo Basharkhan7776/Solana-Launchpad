@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,7 +13,7 @@ import { Input } from "./ui/input";
 export function RequestAirdrop() {
     const wallet = useWallet();
     const { connection } = useConnection();
-    const [amount, setAmount] = useState<number>(NaN);
+    const [amount, setAmount] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const validateInputs = () => {
@@ -23,11 +25,12 @@ export function RequestAirdrop() {
             toast.error("Wallet public key is not available");
             return false;
         }
-        if (isNaN(amount) || amount <= 0) {
+        const numAmount = parseFloat(amount);
+        if (!amount || isNaN(numAmount) || numAmount <= 0) {
             toast.error("Please enter a valid amount");
             return false;
         }
-        if (amount > 2) {
+        if (numAmount > 2) {
             toast.error("Maximum airdrop amount is 2 SOL");
             return false;
         }
@@ -39,19 +42,20 @@ export function RequestAirdrop() {
 
         try {
             setLoading(true);
+            const numAmount = parseFloat(amount);
             const signature = await connection.requestAirdrop(
                 wallet.publicKey,
-                amount * 1e9
+                numAmount * 1e9
             );
-            
+
             const confirmation = await connection.confirmTransaction(signature);
-            
+
             if (confirmation.value.err) {
                 throw new Error("Transaction failed to confirm");
             }
 
-            toast.success(`Successfully airdropped ${amount} SOL`);
-            setAmount(NaN);
+            toast.success(`Successfully airdropped ${numAmount} SOL`);
+            setAmount("");
         } catch (error) {
             console.error("Airdrop failed:", error);
             if (error instanceof Error) {
@@ -80,7 +84,7 @@ export function RequestAirdrop() {
                             <Input 
                                 type="number" 
                                 value={amount} 
-                                onChange={(e) => setAmount(Number(e.target.value))} 
+                                onChange={(e) => setAmount(e.target.value)} 
                                 id="amount" 
                                 placeholder="Enter the amount" 
                                 min={0} 

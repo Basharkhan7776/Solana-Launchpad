@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,8 @@ import {
 import { Copy, LogOut } from "lucide-react";
 import { WalletIcon } from "@/components/wallet-icon";
 import { useWalletModal } from "@/hooks/use-wallet-model";
+import { useAppDispatch } from "@/store/hooks";
+import { setWalletAddress, disconnectWallet as disconnectWalletRedux } from "@/store/walletSlice";
 
 interface WalletMultiButtonProps {
   labels?: {
@@ -38,6 +42,7 @@ export function WalletMultiButton({
 }: WalletMultiButtonProps) {
   const { publicKey, wallet, disconnect, connecting } = useWallet();
   const { setVisible } = useWalletModal();
+  const dispatch = useAppDispatch();
   const [copied, setCopied] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -74,18 +79,26 @@ export function WalletMultiButton({
   const disconnectWallet = async () => {
     try {
       await disconnect();
+      dispatch(disconnectWalletRedux());
       setDropdownOpen(false);
-      setTimeout(() => window.location.reload(), 200);
     } catch (err) {
       console.error('Failed to disconnect:', err);
     }
   };
 
-  // Reload the page after a wallet is selected
+  // Sync wallet connection with Redux
+  useEffect(() => {
+    if (publicKey) {
+      dispatch(setWalletAddress(publicKey.toBase58()));
+    } else {
+      dispatch(disconnectWalletRedux());
+    }
+  }, [publicKey, dispatch]);
+
+  // Reset wallet selection state after connection
   useEffect(() => {
     if (wallet && publicKey && walletSelected) {
       setWalletSelected(false);
-      setTimeout(() => window.location.reload(), 200);
     }
   }, [wallet, publicKey, walletSelected]);
 

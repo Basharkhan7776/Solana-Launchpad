@@ -1,3 +1,5 @@
+"use client";
+
 export function NoWalletsFound() {
     return (
       <div className="text-center p-6">

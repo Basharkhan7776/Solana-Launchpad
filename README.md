@@ -1,6 +1,6 @@
-# Solana Launchpad
+# SolSoil
 
-A modern Solana wallet and launchpad dApp built with React, Vite, and Solana Wallet Adapter.
+A modern Solana wallet and launchpad dApp built with Next.js, React, and Solana Wallet Adapter.
 
 ---
 
@@ -34,25 +34,27 @@ bun install
 bun run dev
 ```
 
-The app will be available at [http://localhost:5173](http://localhost:5173) by default.
+The app will be available at [http://localhost:3000](http://localhost:3000) by default.
 
 ---
 
 ##  Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-VITE_CLOUD_NAME=your_cloud_name
-VITE_UPLOAD_PRESET=your_upload_preset
-VITE_CLOUD_API_KEY=your_cloud_api_key
-VITE_CLOUD_API_SECRET=your_cloud_api_secret
+NEXT_PUBLIC_CLOUD_NAME=your_cloud_name
+NEXT_PUBLIC_UPLOAD_PRESET=your_upload_preset
+NEXT_PUBLIC_CLOUD_API_KEY=your_cloud_api_key
+NEXT_PUBLIC_CLOUD_API_SECRET=your_cloud_api_secret
 ```
 
-- `VITE_CLOUD_NAME`: Your Cloudinary cloud name
-- `VITE_UPLOAD_PRESET`: Your Cloudinary upload preset
-- `VITE_CLOUD_API_KEY`: Your Cloudinary API key
-- `VITE_CLOUD_API_SECRET`: Your Cloudinary API secret
+- `NEXT_PUBLIC_CLOUD_NAME`: Your Cloudinary cloud name
+- `NEXT_PUBLIC_UPLOAD_PRESET`: Your Cloudinary upload preset
+- `NEXT_PUBLIC_CLOUD_API_KEY`: Your Cloudinary API key
+- `NEXT_PUBLIC_CLOUD_API_SECRET`: Your Cloudinary API secret
+
+**Note:** In Next.js, environment variables that need to be exposed to the browser must be prefixed with `NEXT_PUBLIC_`.
 
 
 ---

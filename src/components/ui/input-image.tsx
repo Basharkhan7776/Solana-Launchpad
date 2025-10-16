@@ -28,7 +28,7 @@ const ImagePreview = ({
   </div>
 );
 
-export default function InputImage({ image, setImage }: { image: string | null; setImage: any }) {
+export default function InputImage({ image, setImage }: { image: string | null; setImage: (url: string | null) => void }) {
   const [uploading, setUploading] = useState(false);
 
   const handleUploadToCloudinary = async (file: File) => {
@@ -36,11 +36,11 @@ export default function InputImage({ image, setImage }: { image: string | null; 
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET); // Replace with your unsigned preset name
-  
+      formData.append("upload_preset", process.env.NEXT_PUBLIC_UPLOAD_PRESET || ""); // Replace with your unsigned preset name
+
       // Upload directly to Cloudinary
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, // Replace with your Cloudinary cloud name
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUD_NAME}/image/upload`, // Replace with your Cloudinary cloud name
         {
           method: "POST",
           body: formData,

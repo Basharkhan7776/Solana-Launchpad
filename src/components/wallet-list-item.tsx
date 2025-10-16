@@ -1,3 +1,5 @@
+"use client";
+
 
 import { Button } from "@/components/ui/button";
 import type { Wallet } from "@solana/wallet-adapter-react";

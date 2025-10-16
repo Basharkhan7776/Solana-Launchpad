@@ -1,3 +1,5 @@
+"use client";
+
 import { WalletModal } from "@/components/wallet-modal";
 import { createContext, useState } from "react";
 

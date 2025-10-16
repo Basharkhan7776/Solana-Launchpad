@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,8 +17,8 @@ import { Spinner } from "./ui/spinner";
 export function LaunchPad() {
     const [tokenName, setTokenName] = useState<string>("");
     const [symbol, setSymbol] = useState<string>("");
-    const [supply, setSupply] = useState<number>(NaN);
-    const [image, setImage] = useState<string>("");
+    const [supply, setSupply] = useState<string>("");
+    const [image, setImage] = useState<string | null>(null);
     const { connection } = useConnection();
     const [loading, setLoading] = useState(false);
     const wallet = useWallet();
@@ -38,7 +40,8 @@ export function LaunchPad() {
             toast.error("Please enter a token symbol");
             return false;
         }
-        if (isNaN(supply) || supply <= 0) {
+        const numSupply = parseFloat(supply);
+        if (!supply || isNaN(numSupply) || numSupply <= 0) {
             toast.error("Please enter a valid supply amount");
             return false;
         }
@@ -59,7 +62,7 @@ export function LaunchPad() {
                 mint: mintKeypair.publicKey,
                 name: tokenName.trim(),
                 symbol: symbol.trim().toUpperCase(),
-                uri: image,
+                uri: image!, // We've already validated that image is not null
                 additionalMetadata: [],
             };
 
@@ -132,12 +135,13 @@ export function LaunchPad() {
             const createAtaSignature = await wallet.sendTransaction(createAtaTx, connection);
             await connection.confirmTransaction(createAtaSignature);
 
+            const numSupply = parseFloat(supply);
             const mintToTx = new Transaction().add(
                 createMintToInstruction(
                     mintKeypair.publicKey,
                     associatedToken,
                     wallet.publicKey,
-                    supply * 10 ** 9,
+                    numSupply * 10 ** 9,
                     [],
                     TOKEN_2022_PROGRAM_ID
                 )
@@ -152,8 +156,8 @@ export function LaunchPad() {
             // Reset form
             setTokenName("");
             setSymbol("");
-            setSupply(NaN);
-            setImage("");
+            setSupply("");
+            setImage(null);
 
             // Debug metadata
             const metadataAccount = mintKeypair.publicKey; // Use the PublicKey directly
@@ -209,7 +213,7 @@ export function LaunchPad() {
                                     type="number"
                                     id="supply"
                                     value={supply}
-                                    onChange={(e) => setSupply(Number(e.target.value))}
+                                    onChange={(e) => setSupply(e.target.value)}
                                     placeholder="Enter the token supply"
                                     min={0}
                                     step={0.1}
