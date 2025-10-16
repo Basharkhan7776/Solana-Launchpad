@@ -38,7 +38,9 @@ export const NavigationSheet = () => {
         { id: 'sendtokens', label: 'Send Solana', icon: <Send className="mr-2 h-4 w-4" /> },
         { id: 'requestairdrop', label: 'Request Airdrop', icon: <ArrowDown className="mr-2 h-4 w-4" /> },
         { id: 'signmessage', label: 'Sign Message', icon: <MessageSquare className="mr-2 h-4 w-4" /> },
-        { id: 'launchpad', label: 'SolSoil', icon: <PlusCircle className="mr-2 h-4 w-4" /> },
+        { id: 'launchpad', label: 'Create Token', icon: <PlusCircle className="mr-2 h-4 w-4" /> },
+        { id: 'tokenlist', label: 'My Tokens', icon: <Wallet className="mr-2 h-4 w-4" /> },
+        { id: 'mintmore', label: 'Mint More', icon: <PlusCircle className="mr-2 h-4 w-4" /> },
     ];
 
     return (

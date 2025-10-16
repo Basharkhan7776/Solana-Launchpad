@@ -8,6 +8,8 @@ import { SendTokens } from '@/components/SendTokens';
 import SignMessage from '@/components/SignMessage';
 import { LaunchPad } from '@/components/LaunchPad';
 import { ConnectionNavbar } from '@/components/ConnectionNavbar';
+import { TokenList } from '@/components/TokenList';
+import { MintMore } from '@/components/MintMore';
 import { Toaster } from "@/components/ui/sonner";
 import { motion } from "framer-motion";
 
@@ -65,6 +67,19 @@ export default function Home() {
               id="launchpad"
             >
               <LaunchPad />
+            </motion.div>
+            <motion.div
+              className='lg:col-span-2'
+              variants={itemVariants}
+              id="tokenlist"
+            >
+              <TokenList />
+            </motion.div>
+            <motion.div
+              variants={itemVariants}
+              id="mintmore"
+            >
+              <MintMore />
             </motion.div>
           </motion.div>
         </motion.div>

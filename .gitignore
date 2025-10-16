@@ -29,3 +29,6 @@ next-env.d.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Planning and documentation (private)
+plan.md

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
 import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
-import { Coins, RefreshCcw } from "lucide-react";
+import { Coins, RefreshCcw, Copy, Check } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface TokenAccount {
@@ -19,11 +19,18 @@ interface TokenAccount {
     image?: string;
 }
 
+interface HoveredToken {
+    mint: string;
+    copied: boolean;
+}
+
 export function TokenList() {
     const { connected, publicKey } = useWallet();
     const { connection } = useConnection();
     const [tokens, setTokens] = useState<TokenAccount[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [hoveredToken, setHoveredToken] = useState<string | null>(null);
+    const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
     const fetchTokens = async () => {
         if (!connected || !publicKey) {
@@ -117,15 +124,24 @@ export function TokenList() {
         }
     }, [connected, publicKey]);
 
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedAddress(text);
+            toast.success("Address copied to clipboard");
+            setTimeout(() => setCopiedAddress(null), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            toast.error("Failed to copy address");
+        }
+    };
+
     return (
         <Card className="w-full h-full">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <Coins className="h-5 w-5" />
-                            My Tokens
-                        </CardTitle>
+                        <CardTitle>My Tokens</CardTitle>
                         <CardDescription>
                             View all tokens you've created and own
                         </CardDescription>
@@ -154,39 +170,115 @@ export function TokenList() {
                         No tokens found. Create your first token!
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="max-h-[400px] overflow-y-auto pr-2 space-y-2">
                         {tokens.map((token, index) => (
                             <div
                                 key={index}
-                                className="border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
+                                className="relative group"
+                                onMouseEnter={() => setHoveredToken(token.mint)}
+                                onMouseLeave={() => setHoveredToken(null)}
                             >
-                                <div className="flex items-start gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                        {token.image ? (
-                                            <img
-                                                src={token.image}
-                                                alt={token.name || "Token"}
-                                                className="w-full h-full rounded-full object-cover"
-                                            />
-                                        ) : (
-                                            <Coins className="h-6 w-6 text-primary" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-sm truncate">
-                                            {token.name || "Unknown Token"}
-                                        </h3>
-                                        <p className="text-xs text-muted-foreground">
-                                            {token.symbol || "???"}
-                                        </p>
-                                        <p className="text-lg font-bold mt-1">
-                                            {parseFloat(token.balance).toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground truncate">
-                                            {token.mint.slice(0, 4)}...{token.mint.slice(-4)}
-                                        </p>
+                                {/* Main token card */}
+                                <div className="border rounded-lg p-3 hover:bg-accent transition-all duration-200 cursor-pointer">
+                                    <div className="flex items-center gap-3">
+                                        {/* Token Image */}
+                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                            {token.image ? (
+                                                <img
+                                                    src={token.image}
+                                                    alt={token.name || "Token"}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <Coins className="h-5 w-5 text-primary" />
+                                            )}
+                                        </div>
+
+                                        {/* Token Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="font-semibold text-sm truncate">
+                                                    {token.name || "Unknown Token"}
+                                                </h3>
+                                                <p className="text-sm font-bold">
+                                                    {parseFloat(token.balance).toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-xs text-muted-foreground">
+                                                    {token.symbol || "???"}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                {/* Hover overlay with details */}
+                                {hoveredToken === token.mint && (
+                                    <div className="absolute inset-0 bg-card border-2 border-primary rounded-lg p-3 shadow-lg z-10 animate-in fade-in slide-in-from-top-1 duration-200">
+                                        <div className="flex flex-col h-full justify-between">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                        {token.image ? (
+                                                            <img
+                                                                src={token.image}
+                                                                alt={token.name || "Token"}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <Coins className="h-5 w-5 text-primary" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-semibold text-sm truncate">
+                                                            {token.name || "Unknown Token"}
+                                                        </h3>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {token.symbol || "???"}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1 text-xs">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-muted-foreground">Balance:</span>
+                                                        <span className="font-semibold">{parseFloat(token.balance).toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-muted-foreground">Decimals:</span>
+                                                        <span className="font-semibold">{token.decimals}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Mint Address with Copy Button */}
+                                            <div className="mt-2 pt-2 border-t">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs text-muted-foreground">Mint Address:</p>
+                                                        <p className="text-xs font-mono truncate">{token.mint}</p>
+                                                    </div>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-8 w-8 p-0"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            copyToClipboard(token.mint);
+                                                        }}
+                                                    >
+                                                        {copiedAddress === token.mint ? (
+                                                            <Check className="h-4 w-4 text-green-500" />
+                                                        ) : (
+                                                            <Copy className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
