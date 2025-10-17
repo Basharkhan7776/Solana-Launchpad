@@ -12,6 +12,7 @@ import { TokenList } from '@/components/TokenList';
 import { MintMore } from '@/components/MintMore';
 import { Toaster } from "@/components/ui/sonner";
 import { motion } from "framer-motion";
+import { TableOfContents } from '@/components/TableOfContents';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -40,6 +41,7 @@ export default function Home() {
   return (
     <div className='h-full w-full flex flex-col font-roboto'>
       <Navbar />
+      <TableOfContents />
       <div className='px-4 min-h-screen flex flex-wrap justify-center'>
         <motion.div
           className='mt-[90px] md:w-[1280px] w-full flex flex-col gap-4'
